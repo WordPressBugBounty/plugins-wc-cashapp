@@ -248,54 +248,59 @@ class WC_Cashapp_Square extends WC_Cash_App_Pay_Gateway {
 
 	function wc_cashapp_renew_square_token_cron() {
 		$refresh_token = $this->SQ_Refresh_Token;
-		if ( !$refresh_token ) {
-			// $this->wc_cashapp_refresh_token_logs( 'Missing refresh token' . var_export( $_POST, true ) );
-      return;
-		}
-
-    $data = array( 'refresh_token' => $refresh_token, 'origin' => get_bloginfo('url'), 'admin_email' => get_bloginfo('admin_email') );
+    $error_message = '';
     $url = $this->wc_cash_app_pay_square_url('refresh', true);
 
-    $refresh_token_response = wp_remote_post( $url, array(
-        'method'      => 'POST',
-        'timeout'     => 45,
-        'redirection' => 5,
-        'httpversion' => '1.0',
-        'blocking'    => true,
-        'headers'     => array(),
-        'body'        => $data,
-        'cookies'     => array()
-        )
-    );
+		if ( empty($refresh_token) ) {
+			// $this->wc_cashapp_refresh_token_logs( 'Missing refresh token' . var_export( $_POST, true ) );
+      $error_message = 'Missing refresh token. Please renew it manually in your admin dashboard to keep processing Cash App Pay orders or disable Cash App Pay.';
+		} else if ( filter_var($url, FILTER_VALIDATE_URL) ) {
 
-    $error_message = '';
-    $refresh_body = wp_remote_retrieve_body( $refresh_token_response );
-    if ( !is_wp_error( $refresh_token_response ) && 200 == wp_remote_retrieve_response_code( $refresh_token_response ) ) {
-      $refresh_token_response_body = is_string($refresh_body) ? json_decode( $refresh_body, true ) : $refresh_body;
-      if ( isset( $refresh_token_response_body['access_token'] ) ) {
-          $SQ_Access_Token = $this->update_option( 'SQ_Access_Token', $refresh_token_response_body['access_token'] );
-          if ( $SQ_Access_Token ) {
-            $this->wc_cash_app_locations_api();
-            $msg = 'Square Access token refreshed and updated successfully to *******' . substr($refresh_token_response_body['access_token'], -8);
-            $to = get_bloginfo('admin_email');
-            $headers = array('Content-Type: text/html; charset=UTF-8');
+      $data = array( 'refresh_token' => $refresh_token, 'origin' => get_bloginfo('url'), 'admin_email' => get_bloginfo('admin_email') );
+      $refresh_token_response = wp_remote_post( $url, array(
+          'method'      => 'POST',
+          'timeout'     => 45,
+          'redirection' => 5,
+          'httpversion' => '1.0',
+          'blocking'    => true,
+          'headers'     => array(),
+          'body'        => $data,
+          'cookies'     => array()
+          )
+      );
+      $refresh_body = wp_remote_retrieve_body( $refresh_token_response );
+      if ( !is_wp_error( $refresh_token_response ) && 200 == wp_remote_retrieve_response_code( $refresh_token_response ) ) {
+        $refresh_token_response_body = is_string($refresh_body) ? json_decode( $refresh_body, true ) : $refresh_body;
+        if ( isset( $refresh_token_response_body['access_token'] ) ) {
+            $SQ_Access_Token = $this->update_option( 'SQ_Access_Token', $refresh_token_response_body['access_token'] );
+            if ( $SQ_Access_Token ) {
+              $this->wc_cash_app_locations_api();
+              $msg = 'Square Access token refreshed and updated successfully to *******' . substr($refresh_token_response_body['access_token'], -8);
+              $to = get_bloginfo('admin_email');
+              $headers = array('Content-Type: text/html; charset=UTF-8');
 
-            wp_mail( $to, $msg, $msg, $headers );
+              wp_mail( $to, $msg, $msg, $headers );
 
-            if ( wp_next_scheduled( 'wc_cashapp_square_renewal_token_cron_hook' ) === false ) {
-                wp_schedule_event( time(), 'weekly', 'wc_cashapp_square_renewal_token_cron_hook' );
+              if ( wp_next_scheduled( 'wc_cashapp_square_renewal_token_cron_hook' ) === false ) {
+                  wp_schedule_event( time(), 'weekly', 'wc_cashapp_square_renewal_token_cron_hook' );
+              }
+              return;
+            } else {
+              $error_message = !empty($refresh_body) ? var_export( $refresh_body, true ) : 'Error refreshing access token';
             }
-            return;
-          } else {
-            $error_message = !empty($refresh_body) ? var_export( $refresh_body, true ) : 'Error refreshing access token';
-          }
+        } else {
+          $error_message = !empty($refresh_body) ? var_export( $refresh_body, true ) : 'Failed to update/refresh access token';
+        }
+      } else if ( is_wp_error( $refresh_token_response ) ) {
+        $error_message = method_exists($refresh_token_response,'get_error_message') ? $refresh_token_response->get_error_message() : var_export( $refresh_body, true );
       } else {
-        $error_message = !empty($refresh_body) ? var_export( $refresh_body, true ) : 'Failed to update/refresh access token';
+        $error_message = !empty($refresh_body) ? var_export( $refresh_body, true ) : 'Unknown error';
       }
-    } else if ( is_wp_error( $refresh_token_response ) ) {
-      $error_message = method_exists($refresh_token_response,'get_error_message') ? $refresh_token_response->get_error_message() : var_export( $refresh_body, true );
+
+		} else if ( !filter_var($url, FILTER_VALIDATE_URL) ) {
+      $error_message = "Invalid URL $url";
     } else {
-      $error_message = !empty($refresh_body) ? var_export( $refresh_body, true ) : 'Unknown error';
+      $error_message =  'Unknown error';
     }
 
     if ( !empty($error_message) ) {
@@ -306,7 +311,8 @@ class WC_Cashapp_Square extends WC_Cash_App_Pay_Gateway {
       '<p>An error occured trying to renew your Square access token.</p>
       <p>Please renew it manually in your admin dashboard to keep processing Cash App Pay orders.</p>
       <p>Proceed to your admin dashboard by following <a href="' . admin_url('admin.php?page=wc_cashapp_square') . '">Dashboard > Cash App Pay > Square Tokens</a></p>
-      <br><br>' . $error_message,
+      <br>❌❌❌ ERROR: <strong>' . $error_message . '</strong>',
+      // <br>ERROR:' . $error_message . '<br><br><pre>' . print_r($refresh_token_response) . '</pre>', // var_export( $refresh_body, true )
       array('Content-Type: text/html; charset=UTF-8') );
     }
 	}

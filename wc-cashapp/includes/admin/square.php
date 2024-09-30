@@ -19,7 +19,6 @@ $square_connect_url = $gateway->wc_cash_app_pay_square_connect_url();
 
 <div class="container px-5 py-3 d-flex flex-column justify-content-center align-items-start">
     <h1>Power your business with Cash App by Square.</h1>
-    <?php var_dump($gateway->wc_cash_app_pay_square_get_payment('HX2yQrIFqzIrmrqaJL76RhkidKcZY')); ?>
     <p>Cash App is a mobile payment service developed by Block, Inc., formerly Square, Inc., that allows users to transfer money to one another.</p>
 
     <?php if ($gateway->SQ_Access_Token && $gateway->SQ_Refresh_Token) { ?>

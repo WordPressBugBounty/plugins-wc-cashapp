@@ -192,11 +192,9 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
             if ( !$string ) {
                 return $square_url;
             }
-            if ( !is_admin() ) {
-                return $square_url;
-            }
+            // do not is_admin() here
             require WCCASHAPP_PLUGIN_DIR . 'includes/functions/square-url.php';
-            return $square_url;
+            return wp_kses_post( $square_url );
         }
 
         public function wc_cash_app_pay_square_connect_url() {
@@ -205,7 +203,7 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
                 return $square_connect_url;
             }
             require WCCASHAPP_PLUGIN_DIR . 'includes/functions/square-connect.php';
-            return $square_connect_url;
+            return wp_kses_post( $square_connect_url );
         }
 
         public function wc_cash_app_pay_square_connect_redirect() {
@@ -302,6 +300,7 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
             if ( !is_wp_error( $response ) ) {
                 // convert json to array
                 $locations_result_array = json_decode( wp_remote_retrieve_body( $response ), true );
+                // echo '<pre>'; print_r($locations_result_array); echo '</pre>';
                 if ( empty( $locations_result_array ) ) {
                     $this->wccp_log( 'Locations: No locations found', 'error' );
                     return array(

@@ -2,12 +2,12 @@
 Contributors: theafricanboss, freemius
 Donate Link: https://gurastores.com/get-cash
 Tags: cashapp,cash app,square,payments,woocommerce
-Stable tag: 6.0
+Stable tag: 6.0.1
 Requires PHP: 5.0
 Requires at least: 5.0
-Tested up to: 6.6.1
+Tested up to: 6.6.2
 WC requires at least: 6.0.0
-WC tested up to: 9.1.4
+WC tested up to: 9.3.3
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -131,13 +131,7 @@ After activating the plugin, add your Cash App information such as your $cashtag
 
 == Upgrade Notice ==
 
-- Using wp_remote for the Square customers/payments/refunds API
-- Using Square Payments API & Refunds API & Customer API for Cash App Pay
-- Now processing payments and refunds with the Square API
-- Improved WC_Venmo_Cashapp class methods, html, and error displays
-- Added saving additional order meta_data (sqr_id,sqr_status,sqr_order_id)
-
-= 6.0 =
+= 6.0.1 =
 This update is a major upgrade, enhancement, compatibility release. Updating is highly recommended.
 
 = 5.3.1 =
@@ -145,7 +139,12 @@ This update is a security, stability, maintenance, and compatibility release. Up
 
 == Changelog ==
 
-= 6.0 Aug 15, 2024 =
+= 6.0.1 Oct 1, 2024 =
+- Improved wc_cash_app_pay_square_url
+- Improved wc_cashapp_renew_square_token_cron: better error handling, and error messages
+- Updated Woocommerce and Wordpress compatibility
+
+= 6.0 Sep 1, 2024 =
 
 - Fixed the default Cash App QR code matching issue: wc_cashapp_qrcode_url
 - HPOS compatibility: before_woocommerce_init, fixed functions, and variables
