@@ -253,6 +253,7 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
         protected function wc_cash_app_locations_api( $renew = true ) {
             // https://developer.squareup.com/reference/square/locations-api/list-locations
             $locations = array();
+            $errors = array();
             if ( empty( $this->SQ_Access_Token ) ) {
                 return array(
                     'status'    => false,
@@ -312,7 +313,7 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
                 $locations = $locations_result_array['locations'];
                 $errors = $locations_result_array['errors'];
                 // var_dump($errors);
-                if ( count( (array) $errors ) > 0 ) {
+                if ( !empty( $errors ) && count( (array) $errors ) > 0 ) {
                     $error_message = '';
                     foreach ( $errors as $error ) {
                         $error_message .= $error['detail'] . ' ';
@@ -323,7 +324,7 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
                         'locations' => $locations,
                     );
                 } else {
-                    if ( count( (array) $locations ) > 0 ) {
+                    if ( !empty( $locations ) && count( (array) $locations ) > 0 ) {
                         $options = array();
                         $active_location_ids = array();
                         foreach ( $locations as $location ) {

@@ -14,9 +14,9 @@ if ( ! isset( $nonce ) || wp_verify_nonce( $nonce, $action ) === false ) {
 
 $html = '<div class="wrap">';
 
-$refresh_token = isset($_POST['refresh_token']) ? $_POST['refresh_token'] : ( isset($parsed['refresh_token']) ? $parsed['refresh_token'] : null);
-$access_token = isset($_POST['access_token']) ? $_POST['access_token'] : ( isset($parsed['access_token']) ? $parsed['access_token'] : null);
-$merchant_id = isset($_POST['merchant_id']) ? $_POST['merchant_id'] : ( isset($parsed['merchant_id']) ? $parsed['merchant_id'] : null);
+$refresh_token = isset($_POST['refresh_token']) ? esc_html($_POST['refresh_token']) : ( isset($parsed['refresh_token']) ? esc_html($parsed['refresh_token']) : null);
+$access_token = isset($_POST['access_token']) ? esc_html($_POST['access_token']) : ( isset($parsed['access_token']) ? esc_html($parsed['access_token']) : null);
+$merchant_id = isset($_POST['merchant_id']) ? esc_html($_POST['merchant_id']) : ( isset($parsed['merchant_id']) ? esc_html($parsed['merchant_id']) : null);
 
 // $referer = admin_url('admin.php?page=wc_cashapp_square');
 $referer = admin_url('admin.php?page=wc-settings&tab=checkout&section=cash-app-pay');

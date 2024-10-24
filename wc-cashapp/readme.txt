@@ -2,7 +2,7 @@
 Contributors: theafricanboss, freemius
 Donate Link: https://gurastores.com/get-cash
 Tags: cashapp,cash app,square,payments,woocommerce
-Stable tag: 6.0.1
+Stable tag: 6.0.2
 Requires PHP: 5.0
 Requires at least: 5.0
 Tested up to: 6.6.2
@@ -131,18 +131,19 @@ After activating the plugin, add your Cash App information such as your $cashtag
 
 == Upgrade Notice ==
 
-= 6.0.1 =
-This update is a major upgrade, enhancement, compatibility release. Updating is highly recommended.
+= 6.0.2 =
+This update is a security, stability, maintenance, and compatibility release. Updating is highly recommended.
 
 = 5.3.1 =
 This update is a security, stability, maintenance, and compatibility release. Updating is highly recommended.
 
 == Changelog ==
 
-= 6.0.1 Oct 1, 2024 =
+= 6.0.1-6.0.2 Oct 1-15, 2024 =
 - Improved wc_cash_app_pay_square_url
 - Improved wc_cashapp_renew_square_token_cron: better error handling, and error messages
 - Updated Woocommerce and Wordpress compatibility
+- Updated Freemius to v2.9.0
 
 = 6.0 Sep 1, 2024 =
 
@@ -155,6 +156,12 @@ This update is a security, stability, maintenance, and compatibility release. Up
 - Updated Freemius, Woocommerce and Wordpress compatibility
 
 = 5.3-5.3.1 Aug 15, 2023 =
+
+- Using wp_remote for the Square customers/payments/refunds API
+- Using Square Payments API & Refunds API & Customer API for Cash App Pay
+- Now processing payments and refunds with the Square API
+- Improved WC_Venmo_Cashapp class methods, html, and error displays
+
 - Using wp_remote for the locations/customers/payments/refunds API instead of the Square SDK
 - Updated WC_Cashapp_Update_Order: verify signature, find order
 - Updated WC_Cashapp_Update_Order: update order: update_order, post_title, post_content, response_code
@@ -173,6 +180,9 @@ This update is a security, stability, maintenance, and compatibility release. Up
 - Now processing payments and refunds with the Square API
 - Updated the Square paymentRequest with more details (BuyerEmailAddress, shipping_address, StatementDescriptionIdentifier, CustomerId)
 - Fixed setStatementDescriptionIdentifier with parse_url domain
+
+- Added saving additional order meta_data (sqr_id,sqr_status,sqr_order_id)
+
 - Added saving additional order meta_data (sq_payment_token,sqp_idempotency,sqp_id,sqp_status,sqp_order_id,sqp_receipt,sqr_id,sqr_status,sqr_order_id)
 - Added the Square payment receipt and transactions URL on the thank you page, email, and order note
 - Fixed Square merchant account locations_errors & better locations error handling

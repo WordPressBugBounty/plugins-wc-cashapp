@@ -6,7 +6,7 @@ Plugin URI: https://theafricanboss.com/cashapp
 Description: The #1 finance app in the App Store now on WordPress. Receive Cash App payments on your website with WooCommerce + Cash App
 Author: The African Boss
 Author URI: https://theafricanboss.com
-Version: 6.0.1
+Version: 6.0.2
 Requires PHP: 5.0
 Requires at least: 5.0
 Tested up to: 6.6.2

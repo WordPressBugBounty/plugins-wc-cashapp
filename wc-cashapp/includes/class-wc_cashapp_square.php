@@ -25,7 +25,7 @@ class WC_Cashapp_Square extends WC_Cash_App_Pay_Gateway {
       $access_token = esc_html( $_POST['access_token'] );
       $refresh_token = esc_html( $_POST['refresh_token'] );
 
-      $referer = urldecode( $_POST['_wp_http_referer'] );
+      $referer = wp_kses_post(urldecode( $_POST['_wp_http_referer'] ));
       $html = '<div class="wrap"><div style="padding: 10rem">' ;
 
       if ( !wp_verify_nonce( $_POST['save_live_square_env_nonce'], 'save_live_square_env' ) ) {
@@ -58,13 +58,13 @@ class WC_Cashapp_Square extends WC_Cash_App_Pay_Gateway {
     href="' . $referer . '">Go Back</a></p><br>';
 
       $html .= '</div></div>';
-      echo $html;
+      echo wp_kses_post($html);
       wp_safe_redirect( $referer );
       exit;
   }
 
   function wc_cashapp_revoke_square_token() {
-      $referer = urldecode( $_POST['_wp_http_referer'] );
+      $referer = wp_kses_post(urldecode( $_POST['_wp_http_referer'] ));
       $html = '<div class="wrap"><div style="padding: 10rem">' ;
 
       if ( !wp_verify_nonce( $_POST['revoke_square_token_nonce'], 'revoke_square_token' ) ) {
@@ -115,19 +115,26 @@ class WC_Cashapp_Square extends WC_Cash_App_Pay_Gateway {
       if ( 200 !== wp_remote_retrieve_response_code( $revoke_token_response ) ) {
         $error_message = is_string($revoke_token_response_body) ? var_export($revoke_token_response_body, true) : var_export( $revoke_token_response_body, true );
         $this->wccp_log( $error_message, 'error');
+
+        /*
+        We encountered an error and were unable to remove your access token.
+        Manage your Square Apps https://squareup.com/dashboard/apps/my-applications
+        Error: '{ "message": "Attempted to revoke invalid access token", "type": "service.not_authorized" } '
+        Full Error Details: '{ "message": "Attempted to revoke invalid access token", "type": "service.not_authorized" }'
+        */
         $html .= '<p>We encountered an error and were unable to remove your access token.</p><br><p>Manage your <a href="https://squareup.com/dashboard/apps/my-applications" target="_blank">Square Apps</a></p><br>Error: ' . $error_message;
         $error_message = var_export( $revoke_body, true );
         $html .= "<p>Full Error Details:</p>\n<pre>$error_message</pre>";
       } else {
-        $this->update_option( 'SQ_Access_Token', null );
-        $this->update_option( 'SQ_Refresh_Token', null );
-        $this->update_option( 'SQ_Merchant_Id', null );
-        $this->update_option( 'SQ_Location_Id', null );
-				$this->wc_cash_app_locations_api();
-        wp_clear_scheduled_hook( 'wc_cashapp_square_renewal_token_cron_hook' );
         $html .= '<pre>' . var_export( $revoke_body, true ) . '</pre>';
         // wp_safe_redirect( $referer ); exit;
       }
+      $this->update_option( 'SQ_Access_Token', null );
+      $this->update_option( 'SQ_Refresh_Token', null );
+      $this->update_option( 'SQ_Merchant_Id', null );
+      $this->update_option( 'SQ_Location_Id', null );
+      $this->wc_cash_app_locations_api();
+      wp_clear_scheduled_hook( 'wc_cashapp_square_renewal_token_cron_hook' );
     } else if ( is_wp_error( $revoke_token_response ) ) {
       // print_r( $revoke_token_response );
       $error_message = method_exists($revoke_token_response,'get_error_message') ? $revoke_token_response->get_error_message() : var_export( $revoke_body, true );
@@ -146,12 +153,12 @@ class WC_Cashapp_Square extends WC_Cash_App_Pay_Gateway {
     }
 
     $html .= '</div></div>';
-    echo $html;
+    echo wp_kses_post($html);
     exit;
   }
 
   function wc_cashapp_refresh_square_token() {
-      $referer = urldecode( $_POST['_wp_http_referer'] );
+      $referer = wp_kses_post(urldecode( $_POST['_wp_http_referer'] ));
       $html = '<div class="wrap"><div style="padding: 10rem">';
 
       if ( !wp_verify_nonce( $_POST['refresh_square_token_nonce'], 'refresh_square_token' ) ) {
@@ -231,7 +238,12 @@ class WC_Cashapp_Square extends WC_Cash_App_Pay_Gateway {
     } else {
       // $refresh_token_response_body = json_decode( $refresh_token_response, true );
       $error_message = var_export( $refresh_body, true );
+      /*
+      Failed to update/refresh access token.
+      Error: '{ "message": "Invalid refresh token", "type": "service.not_authorized" }'
+      */
       $html .= "<p>Failed to update/refresh access token.</p>\n\nError:\n<pre>$error_message</pre>";
+
       // $error_message = var_export( $refresh_token_response, true );
       // $html .= "<p>Full Error Details:</p>\n$error_message";
       // $this->wc_cashapp_refresh_token_logs("Failed to update/refresh access token");
