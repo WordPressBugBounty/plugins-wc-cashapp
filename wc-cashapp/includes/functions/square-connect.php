@@ -31,6 +31,6 @@ $redirect = urlencode(admin_url("admin-post.php?action=wc_cash_app_pay_connect&_
 // // $square = "http://localhost:8000/connect?name=$name&domain=$domain&fname=$fname&lname=$lname&email=$email&phone=$phone&extension=$extension&key=$key&thumbnailUrl=$thumbnailUrl";
 // $square = ' <a href="https://square.theafricanboss.com/access.php?sn=' . urlencode(get_bloginfo("name")) . '&su=' . urlencode(get_site_url()) . '&fn=' . urlencode($first_name) . '&ln=' . urlencode($last_name) . '&em=' . urlencode(get_bloginfo("admin_email")) . '&ph=' . urlencode($phone) . '&th=' . urlencode(get_site_icon_url()) . '&_wpnonce=' . urlencode(wp_create_nonce( 'wc_cash_app_pay_connect' )) . '&ref=' . WCCASHAPP_PLUGIN_SLUG . '" target="_blank">Get it here</a>';
 $uniq = uniqid();
-$square_connect_url = "https://square.theafricanboss.com/access.php?nonce=$uniq&_wpnonce=$_wpnonce&redirect=$redirect&sn=$sn&su=$su&fn=$fn&ln=$ln&em=$em&ph=$ph&th=$th&ref=$ref&v=2";
+$square_connect_url = esc_url("https://square.theafricanboss.com/access.php?nonce=$uniq&_wpnonce=$_wpnonce&redirect=$redirect&sn=$sn&su=$su&fn=$fn&ln=$ln&em=$em&ph=$ph&th=$th&ref=$ref&v=2");
 
 ?>

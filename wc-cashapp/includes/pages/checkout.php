@@ -35,8 +35,8 @@ $checkout_html .= '<p>' . wp_kses_post( __( 'Please <strong>use your Order Numbe
 // $checkout_html .= ' ' . esc_html__( 'or Scan', WCCASHAPP_PLUGIN_TEXT_DOMAIN ) . ' > <a href="https://cash.app/', esc_attr( wp_kses_post( $this->ReceiverCashApp ) ), '/' , esc_attr( wp_kses_post( $amount  ) ), '" target="_blank"><img width="150" height="150" class="logo-qr" alt="Cash App Link" src="https://emailreceipts.io/qr?d=100&t=https://cash.app/', esc_attr( wp_kses_post( $this->ReceiverCashApp ) ), '/' , esc_attr( wp_kses_post( $amount  ) ), '"></a></p>';
 $checkout_html .= $qr_code;
 $checkout_html .= '<p>' . wp_kses_post( __( '<strong>After paying, please come back here and place the order</strong> below so we can start processing your order', WCCASHAPP_PLUGIN_TEXT_DOMAIN ) ) . '.</p>';
-$call = esc_html__( 'call', WCCASHAPP_PLUGIN_TEXT_DOMAIN ) . ' <a href="tel:' . esc_html( wp_kses_post( $this->ReceiverCASHAPPNo ) ) . '" target="_blank">' . esc_html( wp_kses_post( $this->ReceiverCASHAPPNo ) ) . '</a>.';
-$email = ' ' . esc_html__( 'You can also email', WCCASHAPP_PLUGIN_TEXT_DOMAIN ) . ' <a href="mailto:' . esc_html( wp_kses_post( $this->ReceiverCASHAPPEmail ) ) . '" target="_blank">' . esc_html( wp_kses_post( $this->ReceiverCASHAPPEmail ) ) . '</a>';
+$call = esc_html__( 'call', WCCASHAPP_PLUGIN_TEXT_DOMAIN ) . ' <a href="tel:' . esc_attr( $this->ReceiverCASHAPPNo ) . '" target="_blank">' . esc_html( $this->ReceiverCASHAPPNo ) . '</a>.';
+$email = ' ' . esc_html__( 'You can also email', WCCASHAPP_PLUGIN_TEXT_DOMAIN ) . ' <a href="mailto:' . esc_attr( $this->ReceiverCASHAPPEmail ) . '" target="_blank">' . esc_html( $this->ReceiverCASHAPPEmail ) . '</a>';
 $checkout_html .= '<p>' . esc_html__( 'If you are having an issue', WCCASHAPP_PLUGIN_TEXT_DOMAIN ) . ', ' . wp_kses_post( ( $call ? $call : '' ) ) . wp_kses_post( ( $email ? $email : '' ) ) . '</p>';
 // toggleTutorial
 if ( 'yes' === $this->toggleTutorial ) {
@@ -48,5 +48,5 @@ if ( 'yes' === $this->toggleTutorial ) {
 // }
 do_action( 'woocommerce_form_end', $this->id );
 $checkout_html .= '<div class="clear"></div></fieldset>';
-echo $checkout_html;
-//return $checkout_html;
+echo wp_kses_post( $checkout_html );
+//return wp_kses_post($checkout_html);

@@ -1,6 +1,7 @@
 <?php if ( ! defined( "ABSPATH" ) ) { exit; }
 
 if ( !class_exists( "WC_Cashapp_Update_Order" ) && class_exists( "WC_Cashapp_Gateway" ) ):
+#[\AllowDynamicProperties]
 class WC_Cashapp_Update_Order extends WC_Cashapp_Gateway {
 
   function register() {

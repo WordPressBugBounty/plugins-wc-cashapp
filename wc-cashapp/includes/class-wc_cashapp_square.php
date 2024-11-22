@@ -1,6 +1,7 @@
 <?php if ( ! defined( 'ABSPATH' ) ) { exit; }
 
 if ( !class_exists( 'WC_Cashapp_Square' ) && class_exists( 'WC_Cash_App_Pay_Gateway' ) ):
+#[\AllowDynamicProperties]
 class WC_Cashapp_Square extends WC_Cash_App_Pay_Gateway {
 
   function register() {
@@ -25,20 +26,20 @@ class WC_Cashapp_Square extends WC_Cash_App_Pay_Gateway {
       $access_token = esc_html( $_POST['access_token'] );
       $refresh_token = esc_html( $_POST['refresh_token'] );
 
-      $referer = wp_kses_post(urldecode( $_POST['_wp_http_referer'] ));
+      $referer = esc_html(urldecode( $_POST['_wp_http_referer'] ));
       $html = '<div class="wrap"><div style="padding: 10rem">' ;
 
       if ( !wp_verify_nonce( $_POST['save_live_square_env_nonce'], 'save_live_square_env' ) ) {
-          wp_die( '<p style="margin-top: 50px;">
+          wp_die( wp_kses_post('<p style="margin-top: 50px;">
   <a style="padding: 1rem; border: none; background-color: black; color: white; text-decoration: none;"
   href="' . $referer . '">Go Back</a></p><br><br>
-  <h1>Invalid nonce</h1>' . var_export( $_POST, true ) );
+  <h1>Invalid nonce</h1>' . var_export( $_POST, true ) ));
       }
       if ( !$referer ) {
-          wp_die( '<p style="margin-top: 50px;">
+          wp_die( wp_kses_post('<p style="margin-top: 50px;">
   <a style="padding: 1rem; border: none; background-color: black; color: white; text-decoration: none;"
   href="' . $referer . '">Go Back</a></p><br><br>
-  <h1>Missing target</h1>' . var_export( $_POST, true ) );
+  <h1>Missing target</h1>' . var_export( $_POST, true ) ));
       }
 
       $this->update_option( 'SQ_Merchant_Id', $merchant_id );
@@ -64,28 +65,28 @@ class WC_Cashapp_Square extends WC_Cash_App_Pay_Gateway {
   }
 
   function wc_cashapp_revoke_square_token() {
-      $referer = wp_kses_post(urldecode( $_POST['_wp_http_referer'] ));
+      $referer = esc_html(urldecode( $_POST['_wp_http_referer'] ));
       $html = '<div class="wrap"><div style="padding: 10rem">' ;
 
       if ( !wp_verify_nonce( $_POST['revoke_square_token_nonce'], 'revoke_square_token' ) ) {
-          wp_die( '<p style="margin-top: 50px;">
+          wp_die( wp_kses_post('<p style="margin-top: 50px;">
   <a style="padding: 1rem; border: none; background-color: black; color: white; text-decoration: none;"
   href="' . $referer . '">Go Back</a></p><br><br>
-  <h1>Invalid nonce</h1>' . var_export( $_POST, true ) );
+  <h1>Invalid nonce</h1>' . var_export( $_POST, true ) ));
       }
       if ( !$referer ) {
-          wp_die( '<p style="margin-top: 50px;">
+          wp_die( wp_kses_post('<p style="margin-top: 50px;">
   <a style="padding: 1rem; border: none; background-color: black; color: white; text-decoration: none;"
   href="' . $referer . '">Go Back</a></p><br><br>
-  <h1>Missing target</h1>' . var_export( $_POST, true ) );
+  <h1>Missing target</h1>' . var_export( $_POST, true ) ));
       }
 
       $access_token = $this->SQ_Access_Token;
       if ( !$access_token ) {
-          wp_die( '<p style="margin-top: 50px;">
+          wp_die( wp_kses_post('<p style="margin-top: 50px;">
   <a style="padding: 1rem; border: none; background-color: black; color: white; text-decoration: none;"
   href="' . $referer . '">Go Back</a></p><br><br>
-  <h1>Missing access token</h1>' . var_export( $_POST, true ) );
+  <h1>Missing access token</h1>' . var_export( $_POST, true ) ));
       }
 
       $data = array( 'access_token' => $access_token, 'origin' => get_bloginfo('url'), 'admin_email' => get_bloginfo('admin_email') );
@@ -158,28 +159,28 @@ class WC_Cashapp_Square extends WC_Cash_App_Pay_Gateway {
   }
 
   function wc_cashapp_refresh_square_token() {
-      $referer = wp_kses_post(urldecode( $_POST['_wp_http_referer'] ));
+      $referer = esc_html(urldecode( $_POST['_wp_http_referer'] ));
       $html = '<div class="wrap"><div style="padding: 10rem">';
 
       if ( !wp_verify_nonce( $_POST['refresh_square_token_nonce'], 'refresh_square_token' ) ) {
-          wp_die( '<p style="margin-top: 50px;">
+          wp_die( wp_kses_post('<p style="margin-top: 50px;">
   <a style="padding: 1rem; border: none; background-color: black; color: white; text-decoration: none;"
   href="' . $referer . '">Go Back</a></p><br><br>
-  <h1>Invalid nonce</h1>' . var_export( $_POST, true ) );
+  <h1>Invalid nonce</h1>' . var_export( $_POST, true ) ));
       }
       if ( !$referer ) {
-          wp_die( '<p style="margin-top: 50px;">
+          wp_die( wp_kses_post('<p style="margin-top: 50px;">
   <a style="padding: 1rem; border: none; background-color: black; color: white; text-decoration: none;"
   href="' . $referer . '">Go Back</a></p><br><br>
-  <h1>Missing target</h1>' . var_export( $_POST, true ) );
+  <h1>Missing target</h1>' . var_export( $_POST, true ) ));
       }
 
       $refresh_token = $this->SQ_Refresh_Token;
       if ( !$refresh_token ) {
-          wp_die( '<p style="margin-top: 50px;">
+          wp_die( wp_kses_post('<p style="margin-top: 50px;">
   <a style="padding: 1rem; border: none; background-color: black; color: white; text-decoration: none;"
   href="' . $referer . '">Go Back</a></p><br><br>
-  <h1>Missing refresh token</h1>' . var_export( $_POST, true ) );
+  <h1>Missing refresh token</h1>' . var_export( $_POST, true ) ));
       }
 
       $data = array( 'refresh_token' => $refresh_token, 'origin' => get_bloginfo('url'), 'admin_email' => get_bloginfo('admin_email') );
@@ -254,17 +255,19 @@ class WC_Cashapp_Square extends WC_Cash_App_Pay_Gateway {
     }
 
     $html .= '</div></div>';
-    echo $html;
+    echo wp_kses_post($html);
     exit;
   }
 
 	function wc_cashapp_renew_square_token_cron() {
 		$refresh_token = $this->SQ_Refresh_Token;
     $error_message = '';
+    if ( 'yes' !== $this->enabled ) { return; }
+
     $url = $this->wc_cash_app_pay_square_url('refresh', true);
 
 		if ( empty($refresh_token) ) {
-			// $this->wc_cashapp_refresh_token_logs( 'Missing refresh token' . var_export( $_POST, true ) );
+			// $this->wc_cashapp_refresh_token_logs( 'Missing refresh token' . wp_kses_post(var_export( $_POST, true ) ));
       $error_message = 'Missing refresh token. Please renew it manually in your admin dashboard to keep processing Cash App Pay orders or disable Cash App Pay.';
 		} else if ( filter_var($url, FILTER_VALIDATE_URL) ) {
 

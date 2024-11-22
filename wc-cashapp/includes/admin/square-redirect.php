@@ -1,15 +1,13 @@
 <?php if ( ! defined( 'ABSPATH' ) ) { exit; }
 
 $action = 'wc_cash_app_pay_connect';
-$nonce = urldecode($_REQUEST['_wpnonce']) ?? urldecode($_GET['_wpnonce']);
+$nonce = isset($_REQUEST['_wpnonce']) ? esc_html(urldecode($_REQUEST['_wpnonce'])) : esc_html(urldecode($_GET['_wpnonce']));
 
-$oauth = isset($_REQUEST['oauth']) ? urldecode($_REQUEST['oauth']) : (isset($_GET['oauth']) ? urldecode($_GET['oauth']) : null);
+$oauth = isset($_REQUEST['oauth']) ? esc_html(urldecode($_REQUEST['oauth'])) : (isset($_GET['oauth']) ? esc_html(urldecode($_GET['oauth'])) : null);
 parse_str($oauth, $parsed);
 
 if ( ! isset( $nonce ) || wp_verify_nonce( $nonce, $action ) === false ) {
-    wp_die( "Invalid nonce. $nonce<br>" .
-    var_export( $parsed, true ) .
-      "<p>Unable to get Square Tokens for Cash App Pay</p>");
+    wp_die( wp_kses_post("Invalid nonce. $nonce<br>" . var_export( $parsed, true ) . "<p>Unable to get Square Tokens for Cash App Pay</p>") );
 }
 
 $html = '<div class="wrap">';

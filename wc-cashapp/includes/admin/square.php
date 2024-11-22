@@ -1,6 +1,6 @@
 <?php if ( ! defined( 'ABSPATH' ) ) { exit; }
 
-$redirect = urlencode( $_SERVER['REQUEST_URI'] );
+$redirect = esc_url(urlencode( $_SERVER['REQUEST_URI'] ));
 $next_renewal = gmdate("F jS, Y g:i a", wp_next_scheduled( 'wc_cashapp_square_renewal_token_cron_hook' ));
 
 $gateway = new WC_Cash_App_Pay_Gateway();
