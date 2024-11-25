@@ -2,7 +2,7 @@
 Contributors: theafricanboss, freemius
 Donate Link: https://gurastores.com/get-cash
 Tags: cashapp,cash app,square,payments,woocommerce
-Stable tag: 6.0.3
+Stable tag: 6.0.3.1
 Requires PHP: 5.0
 Requires at least: 5.0
 Tested up to: 6.7.1
@@ -139,7 +139,7 @@ This update is a security, stability, maintenance, and compatibility release. Up
 
 == Changelog ==
 
-= 6.0.1-6.0.3 Oct 1 - Nov 15, 2024 =
+= 6.0.1-6.0.3.1 Oct 1 - Nov 30, 2024 =
 - Improved wc_cash_app_pay_square_url
 - Improved wc_cashapp_renew_square_token_cron: better error handling, and error messages
 - Updated Woocommerce and Wordpress compatibility
