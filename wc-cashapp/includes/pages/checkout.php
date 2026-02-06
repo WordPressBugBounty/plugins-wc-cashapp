@@ -25,7 +25,7 @@ if ( $this->display_cashapp === 'no' ) {
 if ( empty( $this->ReceiverCashApp ) ) {
     $checkout_html .= '<p>' . wp_kses_post( __( 'Please finish setting up this payment method or contact the admin to do so.', WCCASHAPP_PLUGIN_TEXT_DOMAIN ) ) . '</p>';
     do_action( 'woocommerce_form_end', $this->id );
-    $checkout_html .= '<input name="do_not_checkout" type="hidden" value="true"><div class="clear"></div></fieldset>';
+    $checkout_html .= '<input name="' . $this->id . 'do_not_checkout" type="hidden" value="true"><div class="clear"></div></fieldset>';
     return;
 }
 $checkout_html .= '<p>' . esc_html__( 'Send', WCCASHAPP_PLUGIN_TEXT_DOMAIN ) . ' <a style="color: #00d632" href="' . $payment_url . '" target="_blank">' . $total . " " . esc_html__( 'to', WCCASHAPP_PLUGIN_TEXT_DOMAIN ) . " " . esc_attr( wp_kses_post( $this->ReceiverCashApp ) ) . '</a> ' . esc_html__( 'or click/scan the Cash App button below', WCCASHAPP_PLUGIN_TEXT_DOMAIN ) . '</p>';
@@ -48,5 +48,117 @@ if ( 'yes' === $this->toggleTutorial ) {
 // }
 do_action( 'woocommerce_form_end', $this->id );
 $checkout_html .= '<div class="clear"></div></fieldset>';
-echo wp_kses_post( $checkout_html );
+// echo wp_kses_post($checkout_html); // wp_kses_post strips input so we need another way to escape it
+echo wp_kses( $checkout_html, array(
+    'h2'       => array(
+        'id'    => array(),
+        'class' => array(),
+        'style' => array(),
+    ),
+    'h3'       => array(
+        'id'    => array(),
+        'class' => array(),
+        'style' => array(),
+    ),
+    'h4'       => array(
+        'id'    => array(),
+        'class' => array(),
+        'style' => array(),
+    ),
+    'p'        => array(
+        'id'    => array(),
+        'class' => array(),
+        'style' => array(),
+    ),
+    'fieldset' => array(),
+    'label'    => array(
+        'for' => true,
+    ),
+    'input'    => array(
+        'id'          => array(),
+        'type'        => array(),
+        'name'        => array(),
+        'value'       => array(),
+        'placeholder' => array(),
+        'class'       => array(),
+        'style'       => array(),
+        'checked'     => array(),
+        'disabled'    => array(),
+    ),
+    'div'      => array(
+        'align' => true,
+        'id'    => array(),
+        'class' => array(),
+        'style' => array(),
+    ),
+    'canvas'   => array(
+        'id'    => array(),
+        'class' => array(),
+        'style' => array(),
+    ),
+    'b'        => array(),
+    'strong'   => array(
+        'id'    => array(),
+        'class' => array(),
+        'style' => array(),
+    ),
+    'em'       => array(),
+    'small'    => array(),
+    'strike'   => array(),
+    'span'     => array(
+        'id'    => array(),
+        'class' => array(),
+        'style' => array(),
+    ),
+    'br'       => array(),
+    'hr'       => array(),
+    'ul'       => array(
+        'id'    => array(),
+        'class' => array(),
+        'style' => array(),
+    ),
+    'ol'       => array(
+        'id'    => array(),
+        'class' => array(),
+        'style' => array(),
+    ),
+    'li'       => array(
+        'id'    => array(),
+        'class' => array(),
+        'style' => array(),
+    ),
+    'pre'      => array(),
+    'button'   => array(
+        'id'       => array(),
+        'class'    => array(),
+        'style'    => array(),
+        'disabled' => true,
+        'name'     => true,
+        'type'     => true,
+        'value'    => true,
+    ),
+    'a'        => array(
+        'id'    => array(),
+        'class' => array(),
+        'style' => array(),
+        'href'  => array(),
+        'title' => array(),
+    ),
+    'i'        => array(
+        'id'    => array(),
+        'class' => array(),
+        'style' => array(),
+    ),
+    'img'      => array(
+        'id'      => array(),
+        'class'   => array(),
+        'style'   => array(),
+        'align'   => true,
+        'loading' => true,
+        'alt'     => true,
+        'src'     => true,
+        'height'  => true,
+        'width'   => true,
+    ),
+) );
 //return wp_kses_post($checkout_html);

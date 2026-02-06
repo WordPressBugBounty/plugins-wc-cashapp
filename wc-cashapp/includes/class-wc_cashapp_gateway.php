@@ -5,6 +5,53 @@ if ( !defined( 'ABSPATH' ) ) {
 }
 if ( class_exists( 'WC_Payment_Gateway' ) ) {
     class WC_Cashapp_Gateway extends WC_Payment_Gateway {
+        // // https://woocommerce.github.io/code-reference/classes/WC-Payment-Gateway.html
+        // public $id; // do not include id here as it is already included in the parent class WC_Payment_Gateway
+        // public $icon;
+        // public $has_fields;
+        // public $method_title;
+        // public $method_description;
+        // public $enabled;
+        // public $title;
+        // public $description;
+        public $ReceiverCASHAPPNo;
+
+        public $ReceiverCashApp;
+
+        public $ReceiverCashAppOwner;
+
+        public $ReceiverCASHAPPEmail;
+
+        public $CashAppForwardingURL;
+
+        public $display_cashapp;
+
+        public $display_cashapp_logo_button;
+
+        public $CashAppStockManagement;
+
+        public $checkout_description;
+
+        public $cashapp_notice;
+
+        public $store_instructions;
+
+        public $enableNote;
+
+        public $order_note;
+
+        public $disableMenu;
+
+        public $processOrder;
+
+        public $enable_debug;
+
+        public $toggleSupport;
+
+        public $toggleTutorial;
+
+        public $toggleCredits;
+
         public function __construct() {
             $this->id = 'cashapp';
             // payment gateway plugin ID
@@ -263,12 +310,14 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
             );
             // WooCommerce Blocks support
             add_action( 'woocommerce_blocks_loaded', array($this, 'wc_cashapp_woocommerce_blocks_support') );
+            // Extending stock hold time woocommerce > includes > wc-order-functions.php wc_cancel_unpaid_orders
+            add_action( 'woocommerce_cancel_unpaid_orders', array($this, 'wc_cashapp_cancel_on_hold_orders'), 20 );
         }
 
         public function wc_cashapp_woocommerce_blocks_support() {
-            if ( class_exists( 'WC_Payment_Gateway' ) && class_exists( 'Automattic\\WooCommerce\\Blocks\\Payments\\Integrations\\AbstractPaymentMethodType' ) ) {
+            if ( class_exists( '\\Automattic\\WooCommerce\\Blocks\\Payments\\Integrations\\AbstractPaymentMethodType' ) ) {
                 require_once WCCASHAPP_PLUGIN_DIR . 'includes/class-wc_cashapp_gateway_blocks.php';
-                add_action( 'woocommerce_blocks_payment_method_type_registration', function ( Automattic\WooCommerce\Blocks\Payments\PaymentMethodRegistry $payment_method_registry ) {
+                add_action( 'woocommerce_blocks_payment_method_type_registration', function ( \Automattic\WooCommerce\Blocks\Payments\PaymentMethodRegistry $payment_method_registry ) {
                     $payment_method_registry->register( new WC_Cashapp_Gateway_Blocks_Support() );
                 } );
             }
@@ -287,6 +336,11 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
         }
 
         public function wc_cashapp_qrcode_url( $amount, $note = '' ) {
+            /* // https://cash.app/qr/$emailreceipts/5
+            			$payment_url = 'https://cash.app/qr/'. $this->ReceiverCashApp;
+            			if (floatval($amount) > 0) $payment_url .= "/$amount";
+            			// if ($note) $payment_url .= '?note=' . $note;
+            			return esc_attr($payment_url); */
             $payment_url = $this->wc_cashapp_payment_url( $amount, $note );
             if ( empty( $payment_url ) ) {
                 return '';
@@ -349,6 +403,10 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 
         // Payment Custom JS and CSS
         public function wc_cashapp_payment_scripts() {
+            /* // Only load scripts on classic checkout pages (not block-based checkout)
+            			if (!is_checkout() && !is_checkout_pay_page()) { return; }
+            			// Check if this is a block-based checkout - if so, scripts are handled by blocks
+            			if (function_exists('has_block') && (has_block('woocommerce/checkout') || has_block('woocommerce/cart'))) { return; } */
             if ( 'no' === $this->enabled || empty( $this->ReceiverCashApp ) ) {
                 return;
             }
@@ -392,7 +450,7 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
                     $this->wcc_log( "Checkout: A customer cashtag {$accountid_meta} is invalid", 'error' );
                 }
             }
-            if ( isset( $_POST['do_not_checkout'] ) ) {
+            if ( isset( $_POST[$this->id . 'do_not_checkout'] ) ) {
                 wc_add_notice( esc_html( __( 'Please try another payment method', WCCASHAPP_PLUGIN_TEXT_DOMAIN ) ), 'error' );
                 $this->wcc_log( "Checkout: A customer tried {$this->method_title} while it is not yet fully set up by the admin and was advised to try another payment method", 'error' );
             }
@@ -463,6 +521,30 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
             // $order = wc_get_order( $_GET['id'] );
             // $order->payment_complete();
             // update_option('webhook_debug', $_GET);
+        }
+
+        public function wc_cashapp_cancel_on_hold_orders() {
+            // wp-admin/admin.php?page=wc-settings&tab=products&section=inventory
+            $held_duration = get_option( 'woocommerce_hold_stock_minutes' );
+            if ( !$held_duration || absint( $held_duration ) < 1 ) {
+                return;
+            }
+            $threshold_timestamp = strtotime( '-' . absint( $held_duration ) . ' MINUTES', current_time( 'timestamp' ) );
+            $args = array(
+                'status'         => 'on-hold',
+                'payment_method' => $this->id,
+                'limit'          => -1,
+                'date_created'   => '<' . gmdate( 'Y-m-d H:i:s', $threshold_timestamp ),
+                'return'         => 'ids',
+            );
+            $orders = wc_get_orders( $args );
+            foreach ( $orders as $order_id ) {
+                $order = wc_get_order( $order_id );
+                if ( $order->get_payment_method() !== $this->id ) {
+                    continue;
+                }
+                $order->update_status( 'cancelled', __( "On-hold order cancelled – time limit {$held_duration} mins reached.", 'woocommerce' ) );
+            }
         }
 
     }

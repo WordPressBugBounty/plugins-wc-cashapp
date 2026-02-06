@@ -2,16 +2,18 @@
 
 // namespace Automattic\WooCommerce\Blocks\Payments\Integrations;
 use Automattic\WooCommerce\Blocks\Payments\Integrations\AbstractPaymentMethodType;
-//use Automattic\WooCommerce\Blocks\Assets\Api;
+// use Automattic\WooCommerce\Blocks\Assets\Api;
 final class WC_Cashapp_Gateway_Blocks_Support extends AbstractPaymentMethodType {
     private $gateway;
 
-    protected $name = 'cashapp';
+    public $name = 'cashapp';
 
-    //private $asset_api;
-    //public function __construct( Api $asset_api ) {
+    protected $settings;
+
+    // private $asset_api;
+    // public function __construct( Api $asset_api ) {
     //	$this->asset_api = $asset_api;
-    //}
+    // }
     public function initialize() {
         // $this->settings = get_option( 'woocommerce_cashapp_settings', [] );
         $this->settings = get_option( "woocommerce_{$this->name}_settings", array() );

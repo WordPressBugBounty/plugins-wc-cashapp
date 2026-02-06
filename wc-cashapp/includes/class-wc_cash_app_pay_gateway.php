@@ -5,9 +5,33 @@ if ( !defined( 'ABSPATH' ) ) {
 }
 if ( class_exists( 'WC_Payment_Gateway' ) ) {
     class WC_Cash_App_Pay_Gateway extends WC_Payment_Gateway {
-        // protected $SQ_Merchant_Id;
-        // protected $SQ_Refresh_Token;
-        // protected $SQ_Access_Token;
+        // // https://woocommerce.github.io/code-reference/classes/WC-Payment-Gateway.html
+        // public $id;
+        // public $icon;
+        // public $has_fields;
+        // public $method_title;
+        // public $method_description;
+        // public $enabled;
+        // public $title;
+        // public $description;
+        public $SQ_Merchant_Id;
+
+        public $SQ_Refresh_Token;
+
+        public $SQ_Access_Token;
+
+        public $SQ_Locations;
+
+        public $SQ_Location_Id;
+
+        public $disableMenu;
+
+        public $enable_debug;
+
+        public $toggleTutorial;
+
+        public $status;
+
         public function __construct() {
             $this->id = 'cash-app-pay';
             // payment gateway plugin ID
@@ -16,7 +40,7 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
             $this->has_fields = true;
             // in case you need a custom form
             $this->method_title = 'Cash App Pay';
-            $this->method_description = '<a href="https://cash.app/cash-app-pay" target="_blank">Cash App Pay</a> is the official integration for Square merchants. You need to connect an existing Square merchant account or create one to fully integrate this payment method.<br>
+            $this->method_description = 'This <a href="https://cash.app/cash-app-pay" target="_blank">Cash App Pay</a> is an unofficial integration for Square merchants. You need to connect an existing Square merchant account or create one to fully integrate this payment method.<br>
 			<p><strong>More details about this gateway can be found at <a href="https://square.theafricanboss.com" target="_blank">square.theafricanboss.com</a></strong></p>
 			<p><a href="https://square.theafricanboss.com/signup" target="_blank">Sign up to become a Square merchant using our referral link</a></p>
 			<p>You will receive free processing on up to $1,000 in credit card transactions for the first 180 days* and/or whatever their current offer at signup is that will show once you click on the link</p>
@@ -37,7 +61,7 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
             $this->status = $this->get_option( 'status' );
             // // $this->status = !empty($this->SQ_Access_Token ? ( empty($this->SQ_Location_Id) ? 'Not fully connected to Square ⚠️. Save the location ID' : 'Connected to Square ✅' ) : 'Connect to Square';
             if ( !empty( $this->SQ_Access_Token ) ) {
-                $status = ( empty( $this->SQ_Location_Id ) ? 'Not fully connected to Square ⚠️. Save the location ID' : 'Connected to Square ✅' );
+                $status = ( !empty( $this->SQ_Location_Id ) ? 'Connected to Square ✅' : 'Not fully connected to Square ⚠️. Save the location ID' );
                 $this->update_option( 'status', $status );
             } else {
                 $this->update_option( 'status', 'Connect to Square' );
@@ -301,8 +325,9 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
             if ( !is_wp_error( $response ) ) {
                 // convert json to array
                 $locations_result_array = json_decode( wp_remote_retrieve_body( $response ), true );
+                // error_log(print_r($locations_result_array, true)); // Logs the full array
                 // echo '<pre>'; print_r($locations_result_array); echo '</pre>';
-                if ( empty( $locations_result_array ) ) {
+                if ( empty( $locations_result_array ) || !isset( $locations_result_array ) || !is_array( $locations_result_array['locations'] ) ) {
                     $this->wccp_log( 'Locations: No locations found', 'error' );
                     return array(
                         'status'    => false,
@@ -310,8 +335,8 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
                         'locations' => array(),
                     );
                 }
-                $locations = $locations_result_array['locations'];
-                $errors = $locations_result_array['errors'];
+                $locations = ( isset( $locations_result_array['locations'] ) && is_array( $locations_result_array['locations'] ) ? $locations_result_array['locations'] : array() );
+                $errors = ( isset( $locations_result_array['errors'] ) && is_array( $locations_result_array['errors'] ) ? $locations_result_array['errors'] : array() );
                 // var_dump($errors);
                 if ( !empty( $errors ) && count( (array) $errors ) > 0 ) {
                     $error_message = '';
@@ -380,6 +405,10 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 
         // Payment Custom JS and CSS
         public function wc_cash_app_pay_payment_scripts() {
+            /* // Only load scripts on classic checkout pages (not block-based checkout)
+            			if (!is_checkout() && !is_checkout_pay_page()) { return; }
+            			// Check if this is a block-based checkout - if so, scripts are handled by blocks
+            			if (function_exists('has_block') && (has_block('woocommerce/checkout') || has_block('woocommerce/cart'))) { return; } */
             if ( 'no' === $this->enabled || empty( $this->SQ_Access_Token ) ) {
                 return;
             }
@@ -468,7 +497,7 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
             if ( empty( $this->SQ_Access_Token ) ) {
                 echo '<p>' . wp_kses_post( __( 'Please finish setting up this payment method or contact the admin to do so.', WCCASHAPP_PLUGIN_TEXT_DOMAIN ) ) . '</p>';
                 do_action( 'woocommerce_form_end', $this->id );
-                echo '<input name="do_not_checkout" type="hidden" value="true"><div class="clear"></div></fieldset>';
+                echo '<input name="' . $this->id . 'do_not_checkout" type="hidden" value="true"><div class="clear"></div></fieldset>';
                 return;
             }
             if ( !empty( $this->checkout_description ) ) {
@@ -508,7 +537,7 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
                 wc_add_notice( esc_html( __( 'Invalid Cash App Pay Token. Please click again on the Cash App Pay button or refresh the page', WCCASHAPP_PLUGIN_TEXT_DOMAIN ) ), 'error' );
                 $this->wccp_log( "Checkout: Invalid Cash App Pay Token {$sq_payment_token}", 'error' );
             }
-            if ( isset( $_POST['do_not_checkout'] ) ) {
+            if ( isset( $_POST[$this->id . 'do_not_checkout'] ) ) {
                 wc_add_notice( esc_html( __( 'Please try another payment method', WCCASHAPP_PLUGIN_TEXT_DOMAIN ) ), 'error' );
                 $this->wccp_log( "Checkout: A customer tried {$this->method_title} while it is not yet fully set up by the admin and was advised to try another payment method", 'error' );
             }

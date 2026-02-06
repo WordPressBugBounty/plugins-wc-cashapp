@@ -34,7 +34,7 @@
                 </thead>
                 <tbody>
                     <tr class="feature-row">
-                        <td>Official Square Integration<br /></td>
+                        <td>Square Integration<br /></td>
                         <td class="text-center feature-option">✔</td>
                         <td class="text-center feature-option">x</td>
                     </tr>

@@ -78,7 +78,6 @@ $square_connect_url = $gateway->wc_cash_app_pay_square_connect_url();
 
 </div>
 
-
 <div class="container px-5 py-3 d-flex flex-column justify-content-center align-items-start">
     <p>If having trouble, please <a href="https://theafricanboss.com/contact/" target="_blank">contact support</a></p>
 </div>

@@ -1,7 +1,6 @@
 <?php if ( ! defined( 'ABSPATH' ) ) { exit; }
 
 if ( !class_exists( 'WC_Cashapp_Square' ) && class_exists( 'WC_Cash_App_Pay_Gateway' ) ):
-#[\AllowDynamicProperties]
 class WC_Cashapp_Square extends WC_Cash_App_Pay_Gateway {
 
   function register() {
@@ -65,7 +64,9 @@ class WC_Cashapp_Square extends WC_Cash_App_Pay_Gateway {
   }
 
   function wc_cashapp_revoke_square_token() {
-      $referer = esc_html(urldecode( $_POST['_wp_http_referer'] ));
+      // $referer = esc_html(urldecode( $_POST['_wp_http_referer'] )); // https://wptest.theafricanboss.com/wp-admin/http:///wp-admin/admin.php?page=wc_cashapp_square
+      // $referer = admin_url('admin.php?page=wc_cashapp_square');
+      $referer = admin_url('admin.php?page=wc-settings&tab=checkout&section=cash-app-pay');
       $html = '<div class="wrap"><div style="padding: 10rem">' ;
 
       if ( !wp_verify_nonce( $_POST['revoke_square_token_nonce'], 'revoke_square_token' ) ) {
@@ -159,7 +160,8 @@ class WC_Cashapp_Square extends WC_Cash_App_Pay_Gateway {
   }
 
   function wc_cashapp_refresh_square_token() {
-      $referer = esc_html(urldecode( $_POST['_wp_http_referer'] ));
+      // $referer = esc_html(urldecode( $_POST['_wp_http_referer'] )); // https://wptest.theafricanboss.com/wp-admin/http:///wp-admin/admin.php?page=wc_cashapp_square
+      $referer = admin_url('admin.php?page=wc_cashapp_square');
       $html = '<div class="wrap"><div style="padding: 10rem">';
 
       if ( !wp_verify_nonce( $_POST['refresh_square_token_nonce'], 'refresh_square_token' ) ) {

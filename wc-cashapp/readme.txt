@@ -2,12 +2,13 @@
 Contributors: theafricanboss, freemius
 Donate Link: https://gurastores.com/get-cash
 Tags: cashapp,cash app,square,payments,woocommerce
-Stable tag: 6.0.3.1
+Stable tag: 6.1.1
 Requires PHP: 5.0
 Requires at least: 5.0
-Tested up to: 6.7.1
+Tested up to: 6.9
+Requires Plugins: woocommerce
 WC requires at least: 6.0.0
-WC tested up to: 9.4.2
+WC tested up to: 10.4.3
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -16,6 +17,7 @@ The #1 finance app in the App Store now available on WordPress. Receive Cash App
 == Description ==
 
 **HPOS compatibility & WooCommerce Blocks support**
+**Unlock more great features for you and your customers and priority support with a PRO license. [Upgrade](https://theafricanboss.com/cashapp)**
 
 Checkout with Cash App on WooCommerce is also known as [WooCash, officially listed on Square App Marketplace](https://square.theafricanboss.com/woocash).
 
@@ -131,15 +133,31 @@ After activating the plugin, add your Cash App information such as your $cashtag
 
 == Upgrade Notice ==
 
-= 6.0.3 =
-This update is a security, stability, maintenance, and compatibility release. Updating is highly recommended.
-
-= 5.3.1 =
+= 6.1 =
 This update is a security, stability, maintenance, and compatibility release. Updating is highly recommended.
 
 == Changelog ==
 
+= 6.1 Dec 15, 2025 - 6.1.1 Jan 15, 2026 =
+
+- Updated #wc_cashapp_qrcode img CSS and initCashAppPay square.js
+- Filter last 5 from wc_get_orders by latest HOUR_IN_SECONDS
+- Fixed multiple do_not_checkout
+- square redirect: parse_str($oauth, $parsed); // DO NOT SANITIZE BEFORE PARSING
+- admin_menu with SQ_status
+- notifications: if (! $order ) { exit; }
+- Updated WC_Cash_App_Pay_Gateway: locations, errors arrays
+- Updated from custom_order_tables to cart_checkout_blocks compatibility for block support
+- removed AllowDynamicProperties and declared properties
+- wp_kses instead of wp_kses_post pages
+- rest_api_init inside init
+- init load_plugin_textdomain
+- Added woocommerce_cancel_unpaid_orders action to extend the stock hold time feature to our on-hold orders
+- /vendor/freemius
+- Updated Freemius, Woocommerce and Wordpress compatibility
+
 = 6.0.1-6.0.3.1 Oct 1 - Nov 30, 2024 =
+
 - Improved wc_cash_app_pay_square_url
 - Improved wc_cashapp_renew_square_token_cron: better error handling, and error messages
 - Updated Woocommerce and Wordpress compatibility

@@ -1,10 +1,12 @@
 <?php if ( ! defined( 'ABSPATH' ) ) { exit; }
 
 $action = 'wc_cash_app_pay_connect';
+
+// if ( ! isset( $_REQUEST['_wpnonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash ( $_REQUEST['_wpnonce'] ) ) , '_wpnonce' ) )
 $nonce = isset($_REQUEST['_wpnonce']) ? esc_html(urldecode($_REQUEST['_wpnonce'])) : esc_html(urldecode($_GET['_wpnonce']));
 
-$oauth = isset($_REQUEST['oauth']) ? esc_html(urldecode($_REQUEST['oauth'])) : (isset($_GET['oauth']) ? esc_html(urldecode($_GET['oauth'])) : null);
-parse_str($oauth, $parsed);
+$oauth = isset($_REQUEST['oauth']) ? $_REQUEST['oauth'] : (isset($_GET['oauth']) ? $_GET['oauth'] : null); // DO NOT SANITIZE BEFORE PARSING
+parse_str($oauth, $parsed); // DO NOT SANITIZE BEFORE PARSING
 
 if ( ! isset( $nonce ) || wp_verify_nonce( $nonce, $action ) === false ) {
     wp_die( wp_kses_post("Invalid nonce. $nonce<br>" . var_export( $parsed, true ) . "<p>Unable to get Square Tokens for Cash App Pay</p>") );
@@ -12,16 +14,16 @@ if ( ! isset( $nonce ) || wp_verify_nonce( $nonce, $action ) === false ) {
 
 $html = '<div class="wrap">';
 
-$refresh_token = isset($_POST['refresh_token']) ? esc_html($_POST['refresh_token']) : ( isset($parsed['refresh_token']) ? esc_html($parsed['refresh_token']) : null);
-$access_token = isset($_POST['access_token']) ? esc_html($_POST['access_token']) : ( isset($parsed['access_token']) ? esc_html($parsed['access_token']) : null);
-$merchant_id = isset($_POST['merchant_id']) ? esc_html($_POST['merchant_id']) : ( isset($parsed['merchant_id']) ? esc_html($parsed['merchant_id']) : null);
+$refresh_token = isset($_GET['refresh_token']) ? esc_html($_GET['refresh_token']) : ( isset($parsed['refresh_token']) ? esc_html($parsed['refresh_token']) : null);
+$access_token = isset($_GET['access_token']) ? esc_html($_GET['access_token']) : ( isset($parsed['access_token']) ? esc_html($parsed['access_token']) : null);
+$merchant_id = isset($_GET['merchant_id']) ? esc_html($_GET['merchant_id']) : ( isset($parsed['merchant_id']) ? esc_html($parsed['merchant_id']) : null);
 
 // $referer = admin_url('admin.php?page=wc_cashapp_square');
 $referer = admin_url('admin.php?page=wc-settings&tab=checkout&section=cash-app-pay');
 if ( $refresh_token && $access_token && $merchant_id ) {
-    $SQ_Refresh_Token = $this->update_option( 'SQ_Refresh_Token', $refresh_token );
-    $SQ_Access_Token = $this->update_option( 'SQ_Access_Token', $access_token );
-    $SQ_Merchant_Id = $this->update_option( 'SQ_Merchant_Id', $merchant_id );
+    $SQ_Refresh_Token = $this->update_option( 'SQ_Refresh_Token', wp_kses_post($refresh_token) );
+    $SQ_Access_Token = $this->update_option( 'SQ_Access_Token', wp_kses_post($access_token) );
+    $SQ_Merchant_Id = $this->update_option( 'SQ_Merchant_Id', wp_kses_post($merchant_id) );
 
     if ( $SQ_Access_Token && $SQ_Refresh_Token && $SQ_Merchant_Id ) {
       $this->wc_cash_app_locations_api();
@@ -35,20 +37,20 @@ if ( $refresh_token && $access_token && $merchant_id ) {
       }
     } else {
       $html .= '<h1>Error updating Square tokens</h1><br>' .
-        // var_export( $_POST, true ) . '<br>' . var_export( $parsed, true ) .
+        // var_export( $_GET, true ) . '<br>' . var_export( $parsed, true ) .
       "<p>Unable to update Square Tokens for Cash App Pay</p>";
       $html .= '<p style="margin-top: 50px;">
       <a style="padding: 1rem; border: none; background-color: black; color: white; text-decoration: none;"
       href="' . $referer . '">Go Back and try again</a></p>';
       $html .= '</div>';
-      echo( $html );
-      //   wp_die( $html );
+      echo( wp_kses_post($html) );
+      // wp_die( wp_kses_post($html) );
     }
 
     wp_safe_redirect( $referer ); exit;
 } else {
     $html .= '<h1>Error getting Square tokens</h1><br>' .
-    // var_export( $_POST, true ) . '<br>' . var_export( $parsed, true ) .
+    // var_export( $_GET, true ) . '<br>' . var_export( $parsed, true ) .
     "<p>Unable to update Square Tokens for Cash App Pay</p>";
 }
 
@@ -56,7 +58,7 @@ $html .= '<p style="margin-top: 50px;">
 <a style="padding: 1rem; border: none; background-color: black; color: white; text-decoration: none;"
 href="' . $referer . '">Go Back and try again</a></p>';
 $html .= '</div>';
-wp_die( $html );
+wp_die( wp_kses_post($html) );
 exit;
 
 ?>

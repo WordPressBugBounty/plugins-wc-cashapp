@@ -184,7 +184,7 @@ async function loadCashAppPay() {
 
 	if (!amount || !environment || !locationId) {
 		wc_cash_app_pay_displayMessage(
-			"<p>Missing required parameters. Finish setting up properly first</p>"
+			"<p>Missing required parameters. Finish setting up properly first</p>",
 		);
 		console.error("Missing required parameters");
 		return;
@@ -207,7 +207,7 @@ async function loadCashAppPay() {
 		console.error("window.quare.payments Error:", error);
 		var error_message = typeof error === "object" ? error.message : error;
 		wc_cash_app_pay_displayMessage(
-			"<p>Cash App Pay Tokenization failed<br>" + error_message + "</p>"
+			"<p>Cash App Pay Tokenization failed<br>" + error_message + "</p>",
 		);
 		return;
 	}
@@ -218,12 +218,15 @@ async function loadCashAppPay() {
 		console.error("initialize CashAppPay Error:", error);
 		var error_message = typeof error === "object" ? error.message : error;
 		wc_cash_app_pay_displayMessage(
-			"<p>Initializing Cash App Pay failed<br>" + error_message + "</p>"
+			"<p>Initializing Cash App Pay failed<br>" + error_message + "</p>",
 		);
 		return;
 	}
-	// console.info('initCashAppPay', typeof initCashAppPay, initCashAppPay?.status);
-	if (typeof initCashAppPay === "object" && initCashAppPay.status) {
+	// console.info('initCashAppPay', typeof initCashAppPay, initCashAppPay?.status); // initCashAppPay is not a status object. It is a function that returns an EventTarget-like object (i.e., something with addEventListener, dispatchEvent, etc.).
+	if (
+		typeof initCashAppPay === "object" &&
+		typeof initCashAppPay.addEventListener === "function"
+	) {
 		// console.log("Cash App Pay is ready", initCashAppPay);
 		try {
 			tokenizeCashApp(initCashAppPay);
@@ -231,14 +234,14 @@ async function loadCashAppPay() {
 			console.error(error);
 			var error_message = typeof error === "object" ? error.message : error;
 			wc_cash_app_pay_displayMessage(
-				"<p>Cash App Pay failed tokenization.<br>" + error_message + "</p>"
+				"<p>Cash App Pay failed tokenization.<br>" + error_message + "</p>",
 			);
 			return;
 		}
 	} else {
 		console.error("initCashAppPay", typeof initCashAppPay, initCashAppPay);
 		wc_cash_app_pay_displayMessage(
-			"<p>Unable to load Cash App Pay.<br>Please refresh or try another payment method</p>"
+			"<p>Unable to load Cash App Pay.<br>Please refresh or try another payment method</p>",
 		);
 	}
 }

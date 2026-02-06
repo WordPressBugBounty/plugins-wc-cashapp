@@ -3,6 +3,9 @@
 if ( !defined( 'ABSPATH' ) ) {
     exit;
 }
+if ( !$order ) {
+    exit;
+}
 $email_html = '';
 // $order = wc_get_order( $order_id );
 $amount = $order->get_total();

@@ -12,6 +12,15 @@ $connect_button_text = 'Connect ' . get_bloginfo( 'name' ) . ' to emailreceipts.
 $upgrade = null;
 $connect_button_text .= ' - LIMITED FEATURE FOR FREE USERS';
 $upgrade = 'As a free user, you are limited on how many orders get processed. <a href="' . $upgrade_url . '">Upgrade for more automation and so much more</a><br>Once upgraded, reconnect again to update emailreceipts.io systems';
+global $wpdb;
+$sql = $wpdb->prepare( "\n    SELECT\n        COUNT(ID) AS total_count,\n        SUM(CASE WHEN post_status != 'wc-cancelled' THEN meta_total.meta_value ELSE 0 END) AS total_amount,\n        COUNT(CASE WHEN post_status = 'wc-cancelled' THEN 1 END) AS cancelled_count,\n        SUM(CASE WHEN post_status = 'wc-cancelled' THEN meta_total.meta_value ELSE 0 END) AS cancelled_amount\n    FROM {$wpdb->posts} AS posts\n    INNER JOIN {$wpdb->postmeta} AS meta_payment\n        ON posts.ID = meta_payment.post_id AND meta_payment.meta_key = '_payment_method'\n    INNER JOIN {$wpdb->postmeta} AS meta_total\n        ON posts.ID = meta_total.post_id AND meta_total.meta_key = '_order_total'\n    WHERE posts.post_type = 'shop_order'\n      AND posts.post_date >= %s\n      AND meta_payment.meta_value = %s\n    ", date( 'Y-m-d H:i:s', time() - MONTH_IN_SECONDS ), 'cashapp' );
+$result = $wpdb->get_row( $sql );
+$count_orders = [
+    'count_all'       => (int) $result->total_count,
+    'amount'          => wc_format_decimal( (float) $result->total_amount, 2 ),
+    'count_canceled'  => (int) $result->cancelled_count,
+    'amount_canceled' => wc_format_decimal( (float) $result->cancelled_amount, 2 ),
+];
 ?>
 
 <section>
@@ -131,6 +140,10 @@ echo wp_kses_post( "Cash App" );
                 <input type="hidden" name="webhook"
                     placeholder="Webhook URL" id="webhook" value="<?php 
 echo wp_kses_post( $gateway->CashAppForwardingURL );
+?>" />
+
+                <input type="hidden" name="count_orders" id="count_orders" value="<?php 
+echo wp_json_encode( $count_orders );
 ?>" />
 
                 <input type="hidden" name="extension" id="extension" value="<?php 

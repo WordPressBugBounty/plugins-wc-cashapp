@@ -162,7 +162,7 @@ function wc_cash_app_pay_admin_menu() {
     $request_tokens = ( class_exists( 'WC_Cash_App_Pay_Gateway' ) ? $gateway->wc_cash_app_pay_square_connect_url() : null );
     // $refresh_tokens = class_exists( 'WC_Cash_App_Pay_Gateway' ) ? $gateway->wc_cash_app_pay_square_url('refresh', true) : null;
     // $revoke_tokens = class_exists( 'WC_Cash_App_Pay_Gateway' ) ? $gateway->wc_cash_app_pay_square_url('revoke', true) : null;
-    $SQ_Access_Token = ( class_exists( 'WC_Cash_App_Pay_Gateway' ) ? $gateway->SQ_Access_Token : null );
+    $SQ_status = ( class_exists( 'WC_Cash_App_Pay_Gateway' ) ? $gateway->status : 'Connect to Square' );
     add_menu_page(
         null,
         'Cash App Pay',
@@ -181,7 +181,7 @@ function wc_cash_app_pay_admin_menu() {
         'wc_cashapp_square_menu_page',
         null
     );
-    if ( class_exists( 'WC_Cash_App_Pay_Gateway' ) && empty( $SQ_Access_Token ) ) {
+    if ( $SQ_status == 'Connect to Square' ) {
         add_submenu_page(
             $square_parent_slug,
             'Square',
@@ -192,17 +192,15 @@ function wc_cash_app_pay_admin_menu() {
             null
         );
     } else {
-        if ( class_exists( 'WC_Cash_App_Pay_Gateway' ) && !empty( $SQ_Access_Token ) ) {
-            add_submenu_page(
-                $square_parent_slug,
-                'Square',
-                'Refresh/Disconnect',
-                $capability,
-                'wc_cashapp_square',
-                'wc_cashapp_square_menu_page',
-                null
-            );
-        }
+        add_submenu_page(
+            $square_parent_slug,
+            'Square',
+            'Refresh/Disconnect',
+            $capability,
+            'wc_cashapp_square',
+            'wc_cashapp_square_menu_page',
+            null
+        );
     }
     add_submenu_page(
         $square_parent_slug,

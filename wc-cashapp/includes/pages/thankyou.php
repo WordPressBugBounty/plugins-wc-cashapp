@@ -23,5 +23,116 @@ $thankyou_html .= '<p><strong style="font-size:large;">' . sprintf( esc_html__( 
 $thankyou_html .= $qr_code;
 $thankyou_html .= '<p><strong>' . esc_html__( 'Disclaimer', WCCASHAPP_PLUGIN_TEXT_DOMAIN ) . ': </strong>' . esc_html__( 'Your order will not be processed until funds have cleared in our Cash App account', WCCASHAPP_PLUGIN_TEXT_DOMAIN ) . '.</p>';
 $thankyou_html .= '</div><br><hr><br>';
-echo $thankyou_html;
-// return $thankyou_html;
+// echo wp_kses_post($thankyou_html); // wp_kses_post strips input so we need another way to escape it
+echo wp_kses( $thankyou_html, array(
+    'h2'       => array(
+        'id'    => array(),
+        'class' => array(),
+        'style' => array(),
+    ),
+    'h3'       => array(
+        'id'    => array(),
+        'class' => array(),
+        'style' => array(),
+    ),
+    'h4'       => array(
+        'id'    => array(),
+        'class' => array(),
+        'style' => array(),
+    ),
+    'p'        => array(
+        'id'    => array(),
+        'class' => array(),
+        'style' => array(),
+    ),
+    'fieldset' => array(),
+    'label'    => array(
+        'for' => true,
+    ),
+    'input'    => array(
+        'id'          => array(),
+        'type'        => array(),
+        'name'        => array(),
+        'value'       => array(),
+        'placeholder' => array(),
+        'class'       => array(),
+        'style'       => array(),
+        'checked'     => array(),
+        'disabled'    => array(),
+    ),
+    'div'      => array(
+        'align' => true,
+        'id'    => array(),
+        'class' => array(),
+        'style' => array(),
+    ),
+    'canvas'   => array(
+        'id'    => array(),
+        'class' => array(),
+        'style' => array(),
+    ),
+    'b'        => array(),
+    'strong'   => array(
+        'id'    => array(),
+        'class' => array(),
+        'style' => array(),
+    ),
+    'em'       => array(),
+    'small'    => array(),
+    'strike'   => array(),
+    'span'     => array(
+        'id'    => array(),
+        'class' => array(),
+        'style' => array(),
+    ),
+    'br'       => array(),
+    'hr'       => array(),
+    'ul'       => array(
+        'id'    => array(),
+        'class' => array(),
+        'style' => array(),
+    ),
+    'ol'       => array(
+        'id'    => array(),
+        'class' => array(),
+        'style' => array(),
+    ),
+    'li'       => array(
+        'id'    => array(),
+        'class' => array(),
+        'style' => array(),
+    ),
+    'pre'      => array(),
+    'button'   => array(
+        'id'       => array(),
+        'class'    => array(),
+        'style'    => array(),
+        'disabled' => true,
+        'name'     => true,
+        'type'     => true,
+        'value'    => true,
+    ),
+    'a'        => array(
+        'id'    => array(),
+        'class' => array(),
+        'style' => array(),
+        'href'  => array(),
+        'title' => array(),
+    ),
+    'i'        => array(
+        'id'    => array(),
+        'class' => array(),
+        'style' => array(),
+    ),
+    'img'      => array(
+        'id'      => array(),
+        'class'   => array(),
+        'style'   => array(),
+        'align'   => true,
+        'loading' => true,
+        'alt'     => true,
+        'src'     => true,
+        'height'  => true,
+        'width'   => true,
+    ),
+) );

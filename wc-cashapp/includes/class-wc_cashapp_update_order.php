@@ -1,12 +1,10 @@
 <?php if ( ! defined( "ABSPATH" ) ) { exit; }
 
 if ( !class_exists( "WC_Cashapp_Update_Order" ) && class_exists( "WC_Cashapp_Gateway" ) ):
-#[\AllowDynamicProperties]
 class WC_Cashapp_Update_Order extends WC_Cashapp_Gateway {
 
   function register() {
     add_action( "init", array( $this, "wc_cashapp_cpt" ) );
-    add_action( "rest_api_init", array( $this, "wc_cashapp_update_order_route" ) );
   }
 
   function wc_cashapp_cpt() {
@@ -28,6 +26,7 @@ class WC_Cashapp_Update_Order extends WC_Cashapp_Gateway {
         )
       );
     }
+    add_action( "rest_api_init", array( $this, "wc_cashapp_update_order_route" ) );
   }
 
   function wc_cashapp_update_order_route() {
@@ -230,8 +229,10 @@ class WC_Cashapp_Update_Order extends WC_Cashapp_Gateway {
     }
 
     if (empty($order)) {
-      // "orderby" => "date", "orderby" => "<" . ( time() - 3600 ), 'date_created' => '>' . ( time() - 3600 ), date_created' => '>' . ( time() - DAY_IN_SECONDS ),// ordered before the last hour
-      $orders = wc_get_orders( ["limit" => 5, "payment_method" => $this->id, 'date_created' => '>' . ( time() - 3600 ), "status" => array("wc-on-hold")] );
+      // "orderby" => "date", "orderby" => "<" . ( time() - 3600 ), 'date_created' => '>' . ( time() - 3600 ), date_created' => '>' . ( time() - DAY_IN_SECONDS ),// ordered before the last hour , 'date_created' => '>' . ( time() - 3600 )
+      // $orders = wc_get_orders( ["limit" => 5, "payment_method" => $this->id, "orderby" => "date", "order" => "DESC", "status" => array("wc-on-hold")] );
+      // // https://codex.wordpress.org/Easier_Expression_of_Time_Constants
+      $orders = wc_get_orders( ["limit" => 5, "payment_method" => $this->id, 'date_created' => '>' . ( time() - HOUR_IN_SECONDS ),  "orderby" => "date", "order" => "DESC", "status" => array("wc-on-hold")] );
       // print_r($orders);
       $ordercountmsg = count($orders) . " recent order(s) match(es) your criteria: payment_method: {$this->id}, ordered in the last hour, status: on-hold\n";
       $post_content .= $ordercountmsg;

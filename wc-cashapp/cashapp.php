@@ -6,16 +6,17 @@ Plugin URI: https://theafricanboss.com/cashapp
 Description: The #1 finance app in the App Store now on WordPress. Receive Cash App payments on your website with WooCommerce + Cash App
 Author: The African Boss
 Author URI: https://theafricanboss.com
-Version: 6.0.3.1
+Version: 6.1.1
 Requires PHP: 5.0
 Requires at least: 5.0
-Tested up to: 6.7.1
+Tested up to: 6.9
+Requires Plugins: woocommerce
 WC requires at least: 6.0.0
-WC tested up to: 9.4.2
+WC tested up to: 10.4.3
 Text Domain: wc-cashapp
 Domain Path: languages
 Created: 2020
-Copyright 2024 theafricanboss.com All rights reserved
+Copyright 2026 theafricanboss.com All rights reserved
 */
 // Reach out to The African Boss for website and mobile app development services at theafricanboss@gmail.com
 // or at www.TheAfricanBoss.com or download our app at www.TheAfricanBoss.com/app
@@ -25,7 +26,12 @@ if ( !defined( 'ABSPATH' ) ) {
     exit;
 }
 include_once ABSPATH . 'wp-admin/includes/plugin.php';
-$plugin_data = get_plugin_data( __FILE__ );
+$plugin_data = get_plugin_data( 
+    __FILE__,
+    false,
+    /* $translate */
+    false
+ );
 define( 'WCCASHAPP_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'WCCASHAPP_PLUGIN_BASENAME', plugin_basename( __FILE__ ) );
 define( 'WCCASHAPP_PLUGIN_DIR_URL', plugins_url( '/', __FILE__ ) );
@@ -47,22 +53,23 @@ if ( function_exists( 'cashapp_fs' ) ) {
                     define( 'WP_FS__PRODUCT_9194_MULTISITE', true );
                 }
                 // Include Freemius SDK.
-                require_once dirname( __FILE__ ) . '/freemius/start.php';
+                require_once dirname( __FILE__ ) . '/vendor/freemius/start.php';
                 $cashapp_fs = fs_dynamic_init( array(
-                    'id'             => '9194',
-                    'slug'           => 'wc-cashapp',
-                    'premium_slug'   => 'wc-cashapp-pro',
-                    'type'           => 'plugin',
-                    'public_key'     => 'pk_a8fbfc29e4da59d166c01047b7dfe',
-                    'is_premium'     => false,
-                    'premium_suffix' => 'PRO',
-                    'has_addons'     => false,
-                    'has_paid_plans' => true,
-                    'trial'          => array(
+                    'id'              => '9194',
+                    'slug'            => 'wc-cashapp',
+                    'premium_slug'    => 'wc-cashapp-pro',
+                    'type'            => 'plugin',
+                    'public_key'      => 'pk_a8fbfc29e4da59d166c01047b7dfe',
+                    'is_premium'      => false,
+                    'premium_suffix'  => 'PRO',
+                    'has_addons'      => false,
+                    'has_paid_plans'  => true,
+                    'trial'           => array(
                         'days'               => 3,
                         'is_require_payment' => true,
                     ),
-                    'menu'           => array(
+                    'has_affiliation' => 'selected',
+                    'menu'            => array(
                         'slug'           => 'wc-settings',
                         'override_exact' => true,
                         'first-path'     => 'admin.php?page=wc-settings&tab=checkout&section=cashapp',
@@ -71,7 +78,7 @@ if ( function_exists( 'cashapp_fs' ) ) {
                             'slug' => 'wc-settings',
                         ),
                     ),
-                    'is_live'        => true,
+                    'is_live'         => true,
                 ) );
             }
             return $cashapp_fs;
@@ -93,14 +100,9 @@ if ( function_exists( 'cashapp_fs' ) ) {
     if ( !is_plugin_active( 'woocommerce/woocommerce.php' ) ) {
         require_once WCCASHAPP_PLUGIN_DIR . 'includes/notifications/woocommerce.php';
     }
-    // translations
-    add_action( 'init', function () {
-        load_plugin_textdomain( WCCASHAPP_PLUGIN_TEXT_DOMAIN, false, dirname( plugin_basename( __FILE__ ) ) . '/languages/' );
-    } );
     if ( is_admin() ) {
-        // Plugins Settings Buttons
         add_action( 'plugin_action_links_' . WCCASHAPP_PLUGIN_BASENAME, function ( $links ) {
-            $settings_link = '<a href="' . admin_url( 'admin.php?page=wc-settings&tab=checkout&section=cashapp' ) . '">Cash App Link</a> | <a href="' . admin_url( 'admin.php?page=wc-settings&tab=checkout&section=cash-app-pay' ) . '">Cash App Pay <sup style="color: #39b54a; font-weight: bold;">NEW</sup></a> | <a href="' . admin_url( 'admin.php?page=wc_cashapp_compared' ) . '">Compare Both</a>';
+            $settings_link = '<a href="' . admin_url( 'admin.php?page=wc-settings&tab=checkout&section=cashapp' ) . '">Cash App Link</a> | <a href="' . admin_url( 'admin.php?page=wc-settings&tab=checkout&section=cash-app-pay' ) . '">Cash App Pay</a> | <a href="' . admin_url( 'admin.php?page=wc_cashapp_compared' ) . '">Compare Both</a>';
             array_unshift( $links, $settings_link );
             global $cashapp_fs;
             $upgrade_url = cashapp_fs()->get_upgrade_url();
@@ -122,24 +124,25 @@ if ( function_exists( 'cashapp_fs' ) ) {
         } );
         require_once WCCASHAPP_PLUGIN_DIR . 'includes/admin/dashboard.php';
     }
-    //This action hook registers our PHP class as a WooCommerce payment gateway
     add_filter( 'woocommerce_payment_gateways', 'cashapp_add_gateway_class' );
     function cashapp_add_gateway_class(  $gateways  ) {
         $gateways[] = 'WC_Cashapp_Gateway';
-        // your class name is here
-        $gateways[] .= 'WC_Cash_App_Pay_Gateway';
-        // your class name is here
+        $gateways[] = 'WC_Cash_App_Pay_Gateway';
         return $gateways;
     }
 
     add_action( 'before_woocommerce_init', function () {
-        if ( class_exists( Automattic\WooCommerce\Utilities\FeaturesUtil::class ) ) {
-            Automattic\WooCommerce\Utilities\FeaturesUtil::declare_compatibility( 'custom_order_tables', __FILE__, true );
+        if ( class_exists( '\\Automattic\\WooCommerce\\Utilities\\FeaturesUtil' ) ) {
+            \Automattic\WooCommerce\Utilities\FeaturesUtil::declare_compatibility( 'custom_order_tables', __FILE__, true );
+            \Automattic\WooCommerce\Utilities\FeaturesUtil::declare_compatibility( 'cart_checkout_blocks', __FILE__, true );
         }
     } );
     //The class itself, please note that it is inside plugins_loaded action hook
     add_action( 'plugins_loaded', 'cashapp_init_gateway_class' );
     function cashapp_init_gateway_class() {
+        add_action( 'init', function () {
+            load_plugin_textdomain( WCCASHAPP_PLUGIN_TEXT_DOMAIN, false, WCCASHAPP_PLUGIN_DIR . 'languages/' );
+        } );
         include_once ABSPATH . 'wp-includes/pluggable.php';
         if ( class_exists( 'WC_Payment_Gateway' ) ) {
             require_once WCCASHAPP_PLUGIN_DIR . 'includes/class-wc_cashapp_gateway.php';
